@@ -30,7 +30,7 @@ const Login = () => {
       await login(response.data.token)
       navigate("/home")
     } catch (error: any) {
-      setError(error.response.data.error)
+      setError(error.response.data)
       console.error("Login failed", error)
     } finally {
       setIsLoading(false)
