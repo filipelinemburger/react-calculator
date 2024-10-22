@@ -11,12 +11,13 @@ import IRecord from "../types/record.type"
 
 interface IUserContext {
   isLoading: boolean
+  totalPages: number
   operations: IRecord[] | undefined
   currentBalance: number | undefined
   totalOperations: number | undefined
   setIsLoading: (isLoading: boolean) => void
   refreshUserStats: () => void
-  getOperations: () => void
+  getOperations: (page: number, size: number) => void
 }
 
 const UserContext = createContext<IUserContext | undefined>(undefined)
@@ -24,6 +25,7 @@ const UserContext = createContext<IUserContext | undefined>(undefined)
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const baseUrl = process.env.REACT_APP_BASE_URL
   const [operations, setOperations] = useState<IRecord[] | undefined>()
+  const [totalPages, setTotalPages] = useState<number>(0)
   const [currentBalance, setCurrentBalance] = useState<number | undefined>()
   const [totalOperations, setTotalOperations] = useState<number | undefined>()
   const [isLoading, setIsLoading] = useState(false)
@@ -49,23 +51,30 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [baseUrl])
 
-  const getOperations = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
+  const getOperations = useCallback(
+    async (page: number, size: number) => {
+      try {
+        setIsLoading(true)
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
+        }
+        const response: any = await axios.get(
+          `${baseUrl}/operation?page=${page}&size=${size}`,
+          {
+            headers: headers,
+          }
+        )
+        await setTotalPages(response.data.totalPages)
+        await setOperations(response.data.content)
+      } catch (error: any) {
+        console.error("Failed to get current balance", error)
+      } finally {
+        setIsLoading(false)
       }
-      const response: any = await axios.get(`${baseUrl}/operation/`, {
-        headers: headers,
-      })
-      setOperations(response.data)
-    } catch (error: any) {
-      console.error("Failed to get current balance", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [baseUrl])
+    },
+    [baseUrl]
+  )
 
   useEffect(() => {
     if (!currentBalance) {
@@ -76,6 +85,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const contextValues = useMemo(() => {
     return {
       isLoading,
+      totalPages,
       operations,
       currentBalance,
       totalOperations,
@@ -85,6 +95,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [
     isLoading,
+    totalPages,
     operations,
     currentBalance,
     totalOperations,

@@ -1,16 +1,19 @@
-// src/pages/HomePage.js
-import { useEffect } from "react"
-import { Container, Row, Spinner, Table } from "react-bootstrap"
+import { useEffect, useState } from "react"
+import { Container, Row, Spinner, Table, Button } from "react-bootstrap"
 import { useUserContext } from "../context/userContext"
 
 const OperationList = () => {
-  const { operations, getOperations, isLoading } = useUserContext()
+  const { operations, getOperations, isLoading, totalPages } = useUserContext()
+  const [page, setPage] = useState(0) // Track the current page
+  const [size] = useState(10) // Track the size of each page
 
   useEffect(() => {
-    if (!operations) {
-      getOperations()
-    }
-  }, [getOperations, operations])
+    fetchOperations(page, size)
+  }, [page]) // Refetch when page or size changes
+
+  const fetchOperations = async (page: number, size: number) => {
+    await getOperations(page, size) // Fetch with pagination
+  }
 
   if (isLoading) {
     return (
@@ -56,6 +59,27 @@ const OperationList = () => {
             ))}
         </tbody>
       </Table>
+
+      {/* Pagination Controls */}
+      <div className="d-flex justify-content-between my-3">
+        <Button
+          onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+          disabled={page === 0}
+        >
+          Previous
+        </Button>
+        <span>
+          Page {page + 1} of {totalPages}
+        </span>
+        <Button
+          onClick={() =>
+            setPage((prev) => (prev + 1 < totalPages ? prev + 1 : prev))
+          }
+          disabled={page + 1 >= totalPages}
+        >
+          Next
+        </Button>
+      </div>
     </>
   )
 }
