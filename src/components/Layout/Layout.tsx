@@ -18,15 +18,27 @@ const Layout = ({ children }: any) => {
       {sessionStorage.getItem("jwt_token") && (
         <Navbar bg="dark" variant="dark">
           <Container>
-            <Navbar.Brand href="/react-calculator/home">
-              Calculator App
+            <Navbar.Brand>
+              <Button variant="dark" onClick={() => navigate("/home")}>
+                Calculator App
+              </Button>
             </Navbar.Brand>
             <Nav className="me-auto">
-              <Nav.Link href="/react-calculator/home">Home</Nav.Link>
-              <Nav.Link href="/react-calculator/operation">
-                New Operation
+              <Nav.Link>
+                <Button variant="dark" onClick={() => navigate("/home")}>
+                  Home
+                </Button>
               </Nav.Link>
-              <Nav.Link href="/react-calculator/history">History</Nav.Link>
+              <Nav.Link>
+                <Button variant="dark" onClick={() => navigate("/operation")}>
+                  New Operation
+                </Button>
+              </Nav.Link>
+              <Nav.Link>
+                <Button variant="dark" onClick={() => navigate("/history")}>
+                  History
+                </Button>
+              </Nav.Link>
             </Nav>
             {!isLoading && (
               <div className="text-white fw-bold me-5">
