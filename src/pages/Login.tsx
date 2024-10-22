@@ -32,6 +32,8 @@ const Login = () => {
     } catch (error: any) {
       setError(error.response.data)
       console.error("Login failed", error)
+      setUsername("")
+      setPassword("")
     } finally {
       setIsLoading(false)
     }

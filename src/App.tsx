@@ -15,35 +15,40 @@ function App() {
     <Router basename="/react-calculator">
       <AuthProvider>
         <UserProvider>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route
-                path="/home"
-                element={
-                  <PrivateRoute>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/home"
+              element={
+                <PrivateRoute>
+                  <Layout>
                     <Home />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/operation"
-                element={
-                  <PrivateRoute>
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/operation"
+              element={
+                <PrivateRoute>
+                  <Layout>
                     <Operation />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/history"
-                element={
-                  <PrivateRoute>
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/history"
+              element={
+                <PrivateRoute>
+                  <Layout>
                     <OperationList />
-                  </PrivateRoute>
-                }
-              />
-              {/* <Route
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            {/* <Route
               path="/about"
               element={
                 <PrivateRoute>
@@ -51,8 +56,7 @@ function App() {
                 </PrivateRoute>
                 }
                 /> */}
-            </Routes>
-          </Layout>
+          </Routes>
         </UserProvider>
       </AuthProvider>
     </Router>
