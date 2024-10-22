@@ -79,7 +79,7 @@ const Login = () => {
         <Col xs={12} md={6} className="justify-content-md-center">
           <p className="d-flex justify-content-md-center">New to app?</p>
           <Button
-            variant="secondary"
+            variant="light"
             type="submit"
             className="w-100"
             onClick={() => navigate("/register")}
