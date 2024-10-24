@@ -33,7 +33,6 @@ const Register = () => {
         username,
         password,
       })
-      login(response.data.token)
       navigate("/")
     } catch (error: any) {
       console.error("Register failed", error)

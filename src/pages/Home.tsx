@@ -2,10 +2,20 @@
 import { Button, Container, Row, Col, Spinner } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import { useUserContext } from "../context/userContext"
+import { useEffect } from "react"
+import { useAuthContext } from "../context/authContext"
 
 const HomePage = () => {
   const navigate = useNavigate()
   const { isLoading, currentBalance, totalOperations } = useUserContext()
+  const { isAuthenticated } = useAuthContext()
+  const { refreshUserStats } = useUserContext()
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      refreshUserStats()
+    }
+  }, [isAuthenticated])
 
   if (isLoading) {
     return (

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react"
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap"
-import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { useAuthContext } from "../context/authContext"
 
@@ -9,28 +8,32 @@ const Login = () => {
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const { login } = useAuthContext()
+  const { login, isAuthenticated } = useAuthContext()
   const navigate = useNavigate()
 
-  const baseUrl = process.env.REACT_APP_BASE_URL
+  useEffect(() => {
+    // Clear the error message after 5 seconds
+    if (error) {
+      const timeout = setTimeout(() => setError(""), 5000)
+      return () => clearTimeout(timeout)
+    }
+  }, [error])
 
   useEffect(() => {
-    setTimeout(() => setError(""), 5000)
-  }, [error])
+    // Redirect if already authenticated
+    if (isAuthenticated) {
+      navigate("/home")
+    }
+  }, [isAuthenticated, navigate])
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
       setIsLoading(true)
-      const response: any = await axios.post(`${baseUrl}/api/auth/login`, {
-        username,
-        password,
-      })
-
-      await login(response.data.token)
+      await login(username, password)
       navigate("/home")
     } catch (error: any) {
-      setError(error.response.data)
+      setError(error.response.data || "Login failed")
       console.error("Login failed", error)
       setUsername("")
       setPassword("")
@@ -53,6 +56,7 @@ const Login = () => {
                 placeholder="Enter username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
               />
             </Form.Group>
 
@@ -63,11 +67,12 @@ const Login = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
               />
             </Form.Group>
 
             <Button
-              disabled={!username || !password || isLoading === true}
+              disabled={!username || !password || isLoading}
               variant="primary"
               type="submit"
               className="w-100 mt-3"
@@ -82,7 +87,7 @@ const Login = () => {
           <p className="d-flex justify-content-md-center">New to app?</p>
           <Button
             variant="light"
-            type="submit"
+            type="button"
             className="w-100"
             onClick={() => navigate("/register")}
           >

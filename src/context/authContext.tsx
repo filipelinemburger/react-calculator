@@ -1,30 +1,44 @@
+import axios from "axios"
 import React, { createContext, useCallback, useContext, useMemo } from "react"
+import { useNavigate } from "react-router-dom"
 
 interface IAuthContext {
-  login: (token: string) => void
+  login: (username: string, password: string) => void
   logout: () => void
   isAuthenticated: boolean
 }
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined) // Define context type
+export const JWT_TOKEN = "jwt_token"
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const JWT_TOKEN = "jwt_token"
-  const login = useCallback((token: string) => {
-    sessionStorage.setItem(JWT_TOKEN, token)
+  const navigate = useNavigate()
+  const baseUrl = process.env.REACT_APP_BASE_URL
+  const login = useCallback(async (username: string, password: string) => {
+    const response: any = await axios.post(`${baseUrl}/api/auth/login`, {
+      username,
+      password,
+    })
+    sessionStorage.setItem(JWT_TOKEN, response.data.jwt)
   }, [])
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
+      }
+      await axios.post(`${baseUrl}/api/auth/logout`, null, { headers: headers })
+      navigate("/")
+    } catch (error: any) {
+      console.error("Logout request failed", error)
+    }
     sessionStorage.removeItem(JWT_TOKEN)
-  }, [])
+  }, [baseUrl, login, navigate])
 
   const isAuthenticated = useMemo(() => {
-    console.log(
-      "sessionStorage.getItem(JWT_TOKEN)",
-      sessionStorage.getItem(JWT_TOKEN)
-    )
     return sessionStorage.getItem(JWT_TOKEN) !== null
-  }, [])
+  }, [login, logout])
 
   const contextValues = useMemo(() => {
     return {

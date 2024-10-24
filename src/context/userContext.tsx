@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react"
 import IRecord from "../types/record.type"
+import { JWT_TOKEN } from "./authContext"
 
 interface IUserContext {
   isLoading: boolean
@@ -17,6 +18,7 @@ interface IUserContext {
   totalOperations: number | undefined
   setIsLoading: (isLoading: boolean) => void
   refreshUserStats: () => void
+  clearContextData: () => void
   getOperations: (page: number, size: number) => void
 }
 
@@ -31,25 +33,31 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const refreshUserStats = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
+    if (sessionStorage.getItem(JWT_TOKEN) !== undefined) {
+      console.log()
+      try {
+        setIsLoading(true)
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem(JWT_TOKEN)}`,
+        }
+        const response: any = await axios.get(
+          `${baseUrl}/operation/user-stats`,
+          {
+            headers: headers,
+          }
+        )
+        if (response.data) {
+          await setCurrentBalance(response.data.currentBalance)
+          setTotalOperations(response.data.totalOperations)
+        }
+      } catch (error: any) {
+        console.error("Failed to get current balance", error)
+      } finally {
+        setIsLoading(false)
       }
-      const response: any = await axios.get(`${baseUrl}/operation/user-stats`, {
-        headers: headers,
-      })
-      if (response.data) {
-        await setCurrentBalance(response.data.currentBalance)
-        setTotalOperations(response.data.totalOperations)
-      }
-    } catch (error: any) {
-      console.error("Failed to get current balance", error)
-    } finally {
-      setIsLoading(false)
     }
-  }, [baseUrl])
+  }, [baseUrl, sessionStorage])
 
   const getOperations = useCallback(
     async (page: number, size: number) => {
@@ -57,7 +65,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         setIsLoading(true)
         const headers = {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
+          Authorization: `Bearer ${sessionStorage.getItem(JWT_TOKEN)}`,
         }
         const response: any = await axios.get(
           `${baseUrl}/operation?page=${page}&size=${size}`,
@@ -76,11 +84,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     [baseUrl]
   )
 
-  useEffect(() => {
-    if (!currentBalance) {
-      refreshUserStats()
-    }
-  }, [currentBalance, refreshUserStats])
+  const clearContextData = useCallback(() => {
+    setOperations(undefined)
+    setTotalPages(0)
+    setCurrentBalance(undefined)
+    setTotalOperations(undefined)
+  }, [])
 
   const contextValues = useMemo(() => {
     return {
@@ -91,6 +100,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       totalOperations,
       setIsLoading,
       getOperations,
+      clearContextData,
       refreshUserStats,
     }
   }, [
@@ -101,6 +111,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     totalOperations,
     setIsLoading,
     getOperations,
+    clearContextData,
     refreshUserStats,
   ])
 

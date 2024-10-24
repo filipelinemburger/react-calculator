@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { useAuthContext } from "../context/authContext"
+import { JWT_TOKEN, useAuthContext } from "../context/authContext"
 import axios from "axios"
 import {
   Form,
@@ -48,7 +48,7 @@ const Operation = () => {
     try {
       const headers = {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem(JWT_TOKEN)}`,
       }
 
       const payload = {

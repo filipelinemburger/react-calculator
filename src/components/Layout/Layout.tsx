@@ -1,21 +1,22 @@
 import { Container, Navbar, Nav, Button, Spinner } from "react-bootstrap"
-import { useAuthContext } from "../../context/authContext"
+import { JWT_TOKEN, useAuthContext } from "../../context/authContext"
 import { useNavigate } from "react-router-dom"
 import { useUserContext } from "../../context/userContext"
 
 const Layout = ({ children }: any) => {
   const { logout } = useAuthContext()
-  const { currentBalance, isLoading } = useUserContext()
+  const { clearContextData, currentBalance, isLoading } = useUserContext()
   const navigate = useNavigate()
 
   const doLogout = () => {
+    clearContextData()
     logout()
     navigate("/")
   }
 
   return (
     <div>
-      {sessionStorage.getItem("jwt_token") && (
+      {sessionStorage.getItem(JWT_TOKEN) && (
         <Navbar bg="dark" variant="dark">
           <Container>
             <Navbar.Brand>
