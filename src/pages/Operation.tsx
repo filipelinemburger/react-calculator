@@ -146,7 +146,7 @@ const Operation = () => {
             <Alert variant="success" className="mt-4">
               <Row className="mx-5">
                 <Col md={6}>
-                  {operationResponse.operationResult.replace(/"/g, "")}.
+                  Result: {operationResponse.operationResult.replace(/"/g, "")}
                 </Col>
                 <Col className="mx-5">
                   Your new balance is {operationResponse.amount}.
