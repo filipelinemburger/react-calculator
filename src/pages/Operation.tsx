@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { JWT_TOKEN, useAuthContext } from "../context/authContext"
+import { JWT_TOKEN } from "../context/authContext"
 import axios from "axios"
 import {
   Form,
