@@ -3,21 +3,24 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react"
 import IRecord from "../types/record.type"
-import { JWT_TOKEN } from "./authContext"
+import { JWT_TOKEN, useAuthContext } from "./authContext"
 
 interface IUserContext {
   isLoading: boolean
   totalPages: number
+  currentUser: string | undefined
   operations: IRecord[] | undefined
   currentBalance: number | undefined
   totalOperations: number | undefined
   setIsLoading: (isLoading: boolean) => void
   refreshUserStats: () => void
   clearContextData: () => void
+  setCurrentUser: (currentUser: string | undefined) => void
   getOperations: (page: number, size: number) => void
 }
 
@@ -25,6 +28,7 @@ const UserContext = createContext<IUserContext | undefined>(undefined)
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const baseUrl = process.env.REACT_APP_BASE_URL
+  const [currentUser, setCurrentUser] = useState<string | undefined>()
   const [operations, setOperations] = useState<IRecord[] | undefined>()
   const [totalPages, setTotalPages] = useState<number>(0)
   const [currentBalance, setCurrentBalance] = useState<number | undefined>()
@@ -95,10 +99,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       isLoading,
       totalPages,
       operations,
+      currentUser,
       currentBalance,
       totalOperations,
       setIsLoading,
       getOperations,
+      setCurrentUser,
       clearContextData,
       refreshUserStats,
     }
@@ -106,10 +112,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     isLoading,
     totalPages,
     operations,
+    currentUser,
     currentBalance,
     totalOperations,
     setIsLoading,
     getOperations,
+    setCurrentUser,
     clearContextData,
     refreshUserStats,
   ])

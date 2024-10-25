@@ -10,7 +10,8 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const { logout } = useAuthContext()
-  const { clearContextData, currentBalance, isLoading } = useUserContext()
+  const { setCurrentUser, clearContextData, currentBalance, isLoading } =
+    useUserContext()
   const navigate = useNavigate()
 
   const jwtToken = sessionStorage.getItem(JWT_TOKEN)
@@ -19,7 +20,8 @@ const Layout = ({ children }: LayoutProps) => {
     clearContextData()
     logout()
     navigate("/")
-  }, [clearContextData, logout, navigate])
+    setCurrentUser(undefined)
+  }, [clearContextData, logout, navigate, setCurrentUser])
 
   return (
     <div>

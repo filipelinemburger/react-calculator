@@ -4,15 +4,15 @@ import { useUserContext } from "../context/userContext"
 
 const OperationList = () => {
   const { operations, getOperations, isLoading, totalPages } = useUserContext()
-  const [page, setPage] = useState(0) // Track the current page
-  const [size] = useState(10) // Track the size of each page
+  const [page, setPage] = useState(0)
+  const [size] = useState(10)
 
   useEffect(() => {
     fetchOperations(page, size)
-  }, [page]) // Refetch when page or size changes
+  }, [page])
 
   const fetchOperations = async (page: number, size: number) => {
-    await getOperations(page, size) // Fetch with pagination
+    await getOperations(page, size)
   }
 
   if (isLoading) {
@@ -47,14 +47,14 @@ const OperationList = () => {
         </thead>
         <tbody>
           {operations &&
-            operations.map((record) => (
-              <tr key={record.id}>
+            operations.map((record, index) => (
+              <tr key={record.id || index}>
                 <td>{record.id}</td>
                 <td>{record.operationId}</td>
                 <td>{capitalize(record.operationType.replaceAll("_", " "))}</td>
                 <td>{record.operationCost}</td>
                 <td>{record.userBalance}</td>
-                <td>{new Date(record.date).toLocaleDateString()}</td>{" "}
+                <td>{new Date(record.date).toLocaleDateString()}</td>
               </tr>
             ))}
         </tbody>

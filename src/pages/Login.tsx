@@ -31,7 +31,8 @@ const Login = () => {
     try {
       setIsLoading(true)
       await login(username, password)
-      navigate("/home")
+      const params = { username: username }
+      navigate("/home", { state: params })
     } catch (error: any) {
       setError(error.response.data || "Login failed")
       console.error("Login failed", error)

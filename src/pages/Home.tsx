@@ -1,15 +1,25 @@
 // src/pages/HomePage.js
 import { Button, Container, Row, Col, Spinner } from "react-bootstrap"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useUserContext } from "../context/userContext"
 import { useEffect } from "react"
 import { useAuthContext } from "../context/authContext"
 
 const HomePage = () => {
   const navigate = useNavigate()
-  const { isLoading, currentBalance, totalOperations } = useUserContext()
+  const { currentUser, isLoading, currentBalance, totalOperations } =
+    useUserContext()
   const { isAuthenticated } = useAuthContext()
-  const { refreshUserStats } = useUserContext()
+  const { refreshUserStats, setCurrentUser } = useUserContext()
+
+  const location = useLocation()
+  const { username } = location.state || {}
+
+  useEffect(() => {
+    if (username) {
+      setCurrentUser(username)
+    }
+  }, [setCurrentUser, username])
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -37,9 +47,18 @@ const HomePage = () => {
           </Col>
         </Row>
 
+        {currentUser && (
+          <Row className="justify-content-md-center mt-5">
+            <Col xs={12} md={6} className="justify-content-md-center">
+              <p className="text-center">
+                You are logged in as <b>{currentUser}</b>
+              </p>
+            </Col>
+          </Row>
+        )}
         <Row className="justify-content-md-center">
           <Col xs={12} md={6}>
-            <p className="text-center mt-5">
+            <p className="text-center">
               Your current balance is {currentBalance}. You have already done{" "}
               {totalOperations} operations
             </p>
