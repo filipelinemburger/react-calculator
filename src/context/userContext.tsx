@@ -1,14 +1,13 @@
+import IRecord from "../types/record.type"
+import { JWT_TOKEN } from "./authContext"
 import axios from "axios"
 import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
-  useMemo,
   useState,
+  useMemo,
 } from "react"
-import IRecord from "../types/record.type"
-import { JWT_TOKEN, useAuthContext } from "./authContext"
 
 interface IUserContext {
   isLoading: boolean
@@ -20,6 +19,7 @@ interface IUserContext {
   setIsLoading: (isLoading: boolean) => void
   refreshUserStats: () => void
   clearContextData: () => void
+  setOperations: (operations: IRecord[] | undefined) => void
   setCurrentUser: (currentUser: string | undefined) => void
   getOperations: (page: number, size: number) => void
 }
@@ -104,6 +104,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       totalOperations,
       setIsLoading,
       getOperations,
+      setOperations,
       setCurrentUser,
       clearContextData,
       refreshUserStats,
@@ -117,6 +118,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     totalOperations,
     setIsLoading,
     getOperations,
+    setOperations,
     setCurrentUser,
     clearContextData,
     refreshUserStats,

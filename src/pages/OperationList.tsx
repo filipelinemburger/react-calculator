@@ -1,9 +1,20 @@
 import { useEffect, useState } from "react"
 import { Container, Row, Spinner, Table, Button } from "react-bootstrap"
 import { useUserContext } from "../context/userContext"
+import { JWT_TOKEN } from "../context/authContext"
+import axios from "axios"
 
 const OperationList = () => {
-  const { operations, getOperations, isLoading, totalPages } = useUserContext()
+  const baseUrl = process.env.REACT_APP_BASE_URL
+  const {
+    operations,
+    getOperations,
+    setOperations,
+    isLoading,
+    totalPages,
+    setIsLoading,
+    refreshUserStats,
+  } = useUserContext()
   const [page, setPage] = useState(0)
   const [size] = useState(10)
 
@@ -26,6 +37,32 @@ const OperationList = () => {
     )
   }
 
+  const deleteRecord = async (recordId: number) => {
+    try {
+      setIsLoading(true)
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionStorage.getItem(JWT_TOKEN)}`,
+      }
+      const response: any = await axios.delete(
+        `${baseUrl}/operation?recordId=${recordId}`,
+        {
+          headers: headers,
+        }
+      )
+      if (response.status === 200) {
+        setPage(0)
+        await fetchOperations(page, size)
+        setOperations(operations?.filter((item) => item.id !== recordId))
+        await refreshUserStats()
+      }
+    } catch (error: any) {
+      console.error("Failed to get current balance", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const capitalize = (str: string) =>
     str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase()
 
@@ -43,6 +80,7 @@ const OperationList = () => {
             <th>Operation Cost</th>
             <th>User Balance</th>
             <th>Date</th>
+            <th>Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -55,6 +93,14 @@ const OperationList = () => {
                 <td>{record.operationCost}</td>
                 <td>{record.userBalance}</td>
                 <td>{new Date(record.date).toLocaleDateString()}</td>
+                <th>
+                  <Button
+                    variant="light"
+                    onClick={() => deleteRecord(record.id)}
+                  >
+                    Delete
+                  </Button>
+                </th>
               </tr>
             ))}
         </tbody>
